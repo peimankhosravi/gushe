@@ -11,8 +11,8 @@
         body { 
             font-family: Arial, sans-serif; 
             background-color: white; 
-            margin: 0; 
-            padding: 20px;
+            margin: 10; 
+            padding: 0px;
             margin-top: 0px; 
             display: flex; 
             flex-direction: column;
@@ -46,20 +46,20 @@
             box-sizing: border-box; 
         }
         .control-group { 
-            margin-bottom: 10px; 
+            margin-bottom: 12px; 
         }
         .menu-row { 
             display: flex; 
             align-items: flex-end; 
-            gap: 10px; 
-            margin-bottom: 15px; 
+            gap: 15px; 
+            margin-bottom: 10px; 
             width: 100%;
  
         }
         .menu-container { 
             width: 25%; 
             min-width: 160px; 
-            transform: translateY(10px); 
+            transform: translateY(-3px); 
         }
         .btn-container { 
             flex-grow: 1; 
@@ -84,7 +84,7 @@
             box-sizing: border-box; 
         }
         .btn-export { 
-            width: 15%; 
+            width: 30%; 
             padding: 0px 0px; 
             font-size: 12px; 
             font-weight: bold; 
@@ -101,7 +101,7 @@
             background-color: #00b591; 
         }
         .btn-file-load { 
-            width: 15%; 
+            width: 30%; 
             background-color: #4a5568; 
             color: white;  
             display: inline-flex; 
@@ -147,7 +147,7 @@
             padding: 3px 3px; 
             border-radius: 6px; 
             border: 1px solid #e2e8f0; 
-            margin-top: 15px;
+            margin-top: 30px;
             gap: 5px;
             width: fit-content;
         }
@@ -156,7 +156,7 @@
             background: #ffffff;
             border: 1px solid #cbd5e0;
             border-radius: 4px;
-            width: 30px;
+            width: 40px;
             height: 20px;
             font-size: 14px;
             font-weight: bold;
@@ -180,7 +180,7 @@
             border: 1px solid #cbd5e0;
             border-radius: 4px;
             min-width: 110px;
-            height: 18px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -214,6 +214,7 @@
             width: 100% !important;
             min-width: 100% !important;
         }
+
 
 
     </style>
@@ -267,23 +268,27 @@
             <div class="btn-container">
                 <button class="btn-export" id="export-scl-btn">Export scl</button>
                 <label class="btn-file-load" for="file-input">Load Preset</label>
-				<input type="file" id="file-input" accept=".txt, .TXT, text/plain">
+		<input type="file" id="file-input" accept=".txt, .TXT, text/plain">
                 <!-- 3. Unified Media Play/Stop Toggle Control -->
                 <button class="btn-file-load" id="preview-scale-btn" style="min-width: 80px; transition: all 0.1s ease;">Play</button>
 
 
-				<label class="toggle-container">
+		<label class="toggle-container">
                 <input type="checkbox" id="hold-toggle">
                 Hold
                 </label>
                 
+        <!-- Super simple tablet note-stepping key alignment control -->
+        <div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 15px;">
+            <div class="stepper-container">
 
                 <!-- 1. Alignment Stepper Tools -->
                 <button class="stepper-btn" id="stepper-prev-btn" type="button">&lt;</button>               
-				<div class="stepper-display-box" id="stepper-note-display">C (0¢)</div>
+		<div class="stepper-display-box" id="stepper-note-display">C (0¢)</div>
                 <button class="stepper-btn" id="stepper-next-btn" type="button">&gt;</button>
-         
-
+            </div>
+        </div>
+ 
             </div>
 
 
