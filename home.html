@@ -11,8 +11,8 @@
         body { 
             font-family: Arial, sans-serif; 
             background-color: white; 
-            margin: 10; 
-            padding: 0px;
+            margin: 0; 
+            padding: 10px;
             margin-top: 0px; 
             display: flex; 
             flex-direction: column;
@@ -46,20 +46,20 @@
             box-sizing: border-box; 
         }
         .control-group { 
-            margin-bottom: 12px; 
+            margin-bottom: 10px; 
         }
         .menu-row { 
             display: flex; 
             align-items: flex-end; 
-            gap: 15px; 
-            margin-bottom: 10px; 
+            gap: 10px; 
+            margin-bottom: 15px; 
             width: 100%;
  
         }
         .menu-container { 
             width: 25%; 
             min-width: 160px; 
-            transform: translateY(-3px); 
+            transform: translateY(10px); 
         }
         .btn-container { 
             flex-grow: 1; 
@@ -147,7 +147,7 @@
             padding: 3px 3px; 
             border-radius: 6px; 
             border: 1px solid #e2e8f0; 
-            margin-top: 30px;
+            margin-top: 15px;
             gap: 5px;
             width: fit-content;
         }
@@ -220,22 +220,22 @@
 </head>
     <body>
 
-        <!-- Super simple tablet note-stepping key alignment control -->
-        <div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 15px;">
-            <div class="stepper-container">
 
-                <!-- 1. Alignment Stepper Tools -->
-                <button class="stepper-btn" id="stepper-prev-btn" type="button">&lt;</button>               
-		<div class="stepper-display-box" id="stepper-note-display">C (0¢)</div>
-                <button class="stepper-btn" id="stepper-next-btn" type="button">&gt;</button>
-            </div>
-        </div>
-
+        <div class="menu-row">
+            <div class="menu-container">
+    		<label for="gamut-system-select" style="font-weight: bold; margin-right: 8px;">Tuning Gamut:</label>
+    		<select id="gamut-system-select" style="padding: 6px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;">
+        	    <option value="Pythagorean_limit_11_hybrid">Pythagorean limit 11 hybrid</option>
+        	    <option value="Farad">Farhat</option>
+        	    <option value="EDO_24">Equal temperament quarter tones</option>
+        	    <option value="Limit_15">Limit 15</option>
+    		</select>
+	</div>
 
     <div id="controls">
         <div class="menu-row">
             <div class="menu-container">
-               
+                <label for="mode" style="font-weight: bold; margin-right: 8px;">Mode:</label>
                 <select id="preset-select">
                     <option value="Šur = C(a), D(f), E koron, F, G, A(m)-A koron, B flat">Šur</option>
                     <option value="Dashti (Šur) = C, D(f), E koron, F(a), G, A(s)-A koron, B flat">Dashti (Šur)</option>
@@ -251,12 +251,13 @@
                     <option value="Rast-Panjgah = C, D, E, F(a+f), G, A, B flat"> Rast-Panjgah </option>
                     <option value="Harmonic Limit-15 = C(H8), 9/8(H9), 5/4(H10), 11/8(H11), 3/2(H12), 13/8(H13), 14/8(H14), 15/8(H15)"> Harmonic Limit-15 </option>
                     <option value="Farhat = C, 90, 135, 205, 295, 340, 410, 500, 565, 630, 700, 790, 835, 905, 995, 1040, 1130"> Farhat </option>
-		    <option value="EDO = C, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150"> EDO </option>
+		    <option value="EDO24 = C, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150"> EDO </option>
                 </select>
 
             </div>
 
     </div>
+
 
         <div class="control-group">
             <input type="text" id="text-entry" value="Šur = C(a), D(f), E koron, F, G, A(m)-A koron, B flat">
@@ -278,7 +279,20 @@
 
             </div>
 
-	<div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 20px;">
+
+        <!-- Super simple tablet note-stepping key alignment control -->
+        <div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 0px;">
+            <div class="stepper-container">
+
+                <!-- 1. Alignment Stepper Tools -->
+                <button class="stepper-btn" id="stepper-prev-btn" type="button">&lt;</button>               
+		<div class="stepper-display-box" id="stepper-note-display">C (0¢)</div>
+                <button class="stepper-btn" id="stepper-next-btn" type="button">&gt;</button>
+            </div>
+        </div>
+
+
+	<div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 0px;">
 		<canvas id="canvas" width="700" height="630"></canvas>
 	</div>
 
@@ -297,11 +311,88 @@
 
 <script>
 
+const TUNING_GAMUT_PRESETS = {
+    "Pythagorean_limit_11_hybrid": [
+        { name: "C", ratio: "1/1", type: "dynamic" },
+        { name: "C sori", ratio: "33/32", type: "dynamic" },
+        { name: "D flat", ratio: "256/243", type: "dynamic" },
+        { name: "D koron", ratio: "12/11", type: "dynamic" },
+        { name: "D", ratio: "9/8", type: "dynamic" },
+        { name: "E flat", ratio: "32/27", type: "dynamic" },
+        { name: "E koron", ratio: "27/22", type: "dynamic" },
+        { name: "E", ratio: "81/64", type: "dynamic" },
+        { name: "F", ratio: "4/3", type: "dynamic" },
+        { name: "F sori", ratio: "11/8", type: "dynamic" },
+        { name: "F sharp", ratio: "729/512", type: "dynamic" },
+        { name: "G koron", ratio: "16/11", type: "dynamic" },
+        { name: "G", ratio: "3/2", type: "dynamic" },
+        { name: "A flat", ratio: "128/81", type: "dynamic" },
+        { name: "A koron", ratio: "18/11", type: "dynamic" },
+        { name: "A", ratio: "27/16", type: "dynamic" },
+        { name: "B flat", ratio: "16/9", type: "dynamic" },
+        { name: "B koron", ratio: "81/44", type: "dynamic" },
+        { name: "B", ratio: "243/128", type: "dynamic" },
+        { name: "C koron", ratio: "64/33", type: "dynamic" }
+    ],
+    "EDO_24": [
+        { name: "C", ratio: "0.0", type: "dynamic" }, // Treated as 0 cents
+        { name: "C sori", ratio: "50.0", type: "dynamic" },
+        { name: "D flat", ratio: "100.0", type: "dynamic" },
+        { name: "D koron", ratio: "150.0", type: "dynamic" },
+        { name: "D", ratio: "200.0", type: "dynamic" },
+        { name: "E flat", ratio: "300.0", type: "dynamic" },
+        { name: "E koron", ratio: "350.0", type: "dynamic" },
+        { name: "E", ratio: "400.0", type: "dynamic" },
+        { name: "F", ratio: "500.0", type: "dynamic" },
+        { name: "F sori", ratio: "550.0", type: "dynamic" },
+        { name: "F sharp", ratio: "600.0", type: "dynamic" },
+        { name: "G koron", ratio: "650.0", type: "dynamic" },
+        { name: "G", ratio: "700.0", type: "dynamic" },
+        { name: "A flat", ratio: "800.0", type: "dynamic" },
+        { name: "A koron", ratio: "850.0", type: "dynamic" },
+        { name: "A", ratio: "900.0", type: "dynamic" },
+        { name: "B flat", ratio: "1000.0", type: "dynamic" },
+        { name: "B koron", ratio: "1050.0", type: "dynamic" },
+        { name: "B", ratio: "1100.0", type: "dynamic" },
+        { name: "C koron", ratio: "1150.0", type: "dynamic" }
+    ],
+    "Farad": [
+        { name: "C", ratio: "0.0", type: "dynamic" },
+        { name: "D flat", ratio: "90.0", type: "dynamic" },
+        { name: "D koron", ratio: "135.0", type: "dynamic" },
+        { name: "D", ratio: "205.0", type: "dynamic" },
+        { name: "E flat", ratio: "295.0", type: "dynamic" },
+        { name: "E koron", ratio: "340.0", type: "dynamic" },
+        { name: "E", ratio: "410.0", type: "dynamic" },
+        { name: "F", ratio: "500.0", type: "dynamic" },
+        { name: "F sori", ratio: "565.0", type: "dynamic" },
+        { name: "G koron", ratio: "630.0", type: "dynamic" },
+        { name: "G", ratio: "700.0", type: "dynamic" },
+        { name: "A flat", ratio: "790.0", type: "dynamic" },
+        { name: "A koron", ratio: "835.0", type: "dynamic" },
+        { name: "A", ratio: "905.0", type: "dynamic" },
+        { name: "B flat", ratio: "995.0", type: "dynamic" },
+        { name: "B koron", ratio: "1040.0", type: "dynamic" },
+        { name: "B", ratio: "1130.0", type: "dynamic" }
+    ],
+
+    "Limit_15": [
+        { name: "C", ratio: "1/1", type: "dynamic" },
+        { name: "D", ratio: "9/8", type: "dynamic" },
+        { name: "E", ratio: "5/4", type: "dynamic" },
+        { name: "F sori", ratio: "11/8", type: "dynamic" },
+        { name: "G", ratio: "3/2", type: "dynamic" },
+        { name: "A koron", ratio: "13/8", type: "dynamic" },
+        { name: "B flat", ratio: "14/8", type: "dynamic" },
+        { name: "B", ratio: "15/8", type: "dynamic" }
+    ]
+};
+
+
     // Keep track of which background node index is currently targeted by our step selection
     let currentStepperIndex = 0;
     // Tracks which note name is tied to each active finger pointer ID
     const activeTouchNotesMap = new Map();
-
 
 
     const masterNoteMatrix = [
@@ -326,6 +417,11 @@
         { name: "B", ratio: "243/128", type: "dynamic" },
         { name: "C koron", ratio: "64/33", type: "dynamic" }
     ];
+
+
+
+
+
     const noteNames = masterNoteMatrix.map(n => n.name);
     const ratios = masterNoteMatrix.map(n => n.ratio);
     const customPitches = {};
@@ -1002,6 +1098,97 @@ function playScalePreview() {
     const activeKeyboardKeysHeld = {}; const activeKeyboardKeyToNoteNameMap = {};
     const latchedKeyboardKeys = new Set();
     function getDetourCentsForNote(note, noteCentsMap) { if (!detourMap[note]) return null; const partner = detourMap[note]; return customPitches[partner] !== undefined ? customPitches[partner] : noteCentsMap[partner]; }
+
+// =========================================================================
+// 2. BULLETPROOF GENERIC TUNING MATRIX CONTROLLER & MATH RUNNER
+// =========================================================================
+function changeUnderlyingTuningGamut(selectorValue) {
+    if (!selectorValue) return;
+
+    // 1. Fully Generic Lookup: Direct key access from the select value
+    const freshGamutData = TUNING_GAMUT_PRESETS[selectorValue];
+    
+    if (!freshGamutData) {
+        console.error("Tuning preset lookup missing matching case details:", selectorValue);
+        return;
+    }
+
+    // 2. Wipe parallel tracking arrays clean without destroying references
+    masterNoteMatrix.length = 0; 
+    noteNames.length = 0;
+    ratios.length = 0;
+    cents.length = 0;
+    nodeTypes.length = 0;
+
+    for (let key in customPitches) {
+        delete customPitches[key];
+    }
+
+    // 3. Rebuild structures supporting both mixed fractions and raw cent strings safely
+    freshGamutData.forEach((node) => {
+        noteNames.push(node.name);
+        
+        let calculatedCentsVal = 0;
+        let visualRatioLabel = node.ratio;
+        let compliantEngineRatio = node.ratio;
+
+        if (String(node.ratio).includes("/")) {
+            // -- Ratios Parser Framework --
+            const slashPos = node.ratio.indexOf("/");
+            const num = Number(node.ratio.substring(0, slashPos));
+            const den = Number(node.ratio.substring(slashPos + 1));
+            calculatedCentsVal = 1200.0 * Math.log2(num / den);
+            
+            const profile = getHarmonicProfile(num, den);
+            let temp_top = profile, temp_bot = profile;
+            while (temp_top % 3 === 0 && temp_top > 0) temp_top = Math.floor(temp_top / 3);
+            while (temp_bot % 3 === 0 && temp_bot > 0) temp_bot = Math.floor(temp_bot / 3);
+            nodeTypes.push((temp_top === 11 || temp_bot === 11) ? 'limit_11' : 'pythagorean');
+        } else {
+            // -- Cents Parser Framework (e.g., for EDO_24) --
+            calculatedCentsVal = parseFloat(node.ratio);
+            nodeTypes.push('pythagorean'); 
+            
+            visualRatioLabel = calculatedCentsVal.toFixed(1) + "¢";
+            
+            // Build compliant fallback ratio string to prevent down-stream app crashes
+            const decimalMultiplier = Math.pow(2.0, calculatedCentsVal / 1200.0);
+            compliantEngineRatio = decimalMultiplier.toFixed(6) + "/1";
+        }
+
+        // Push sanitized node blocks directly to the global engine array matrix
+        cents.push(calculatedCentsVal);
+        ratios.push(compliantEngineRatio);
+
+        masterNoteMatrix.push({
+            name: node.name,
+            ratio: compliantEngineRatio, 
+            type: node.type,
+            calculatedCents: calculatedCentsVal,
+            txtLine1: getCleanSymbolLabel(node.name) + " (" + visualRatioLabel + ")",
+            txtLine2: Math.round(calculatedCentsVal) + "¢"
+        });
+    });
+
+    // 4. Force audio engine cleanup to kill lingering voice threads
+    if (typeof stopAllVoices === 'function') {
+        stopAllVoices();
+    }
+
+    // 5. Draw updated pitch maps straight to screen view ports
+    if (typeof updatePlot === 'function') {
+        updatePlot();
+    }
+}
+
+
+// Attach listener to the select option menu component
+const gamutDropdownMenu = document.getElementById('gamut-system-select');
+if (gamutDropdownMenu) {
+    gamutDropdownMenu.addEventListener('change', (e) => {
+        changeUnderlyingTuningGamut(e.target.value);
+    });
+}
 
 
 window.addEventListener('keydown', (e) => {
