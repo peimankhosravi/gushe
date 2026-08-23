@@ -84,7 +84,7 @@
             box-sizing: border-box; 
         }
         .btn-export { 
-            width: 30%; 
+            width: 20%; 
             padding: 0px 0px; 
             font-size: 12px; 
             font-weight: bold; 
@@ -101,7 +101,7 @@
             background-color: #00b591; 
         }
         .btn-file-load { 
-            width: 30%; 
+            width: 20%; 
             background-color: #4a5568; 
             color: white;  
             display: inline-flex; 
@@ -130,7 +130,7 @@
         .toggle-container {
             display: inline-flex; 
             align-items: center; 
-            gap: 0px; 
+            gap: 4px; 
             height: 20px;
             font-weight: bold; 
             font-size: 12px; 
@@ -147,8 +147,8 @@
             padding: 3px 3px; 
             border-radius: 6px; 
             border: 1px solid #e2e8f0; 
-            margin-top: 30px;
-            gap: 5px;
+            margin-top: 10px;
+            gap: 1px;
             width: fit-content;
         }
 
@@ -180,7 +180,7 @@
             border: 1px solid #cbd5e0;
             border-radius: 4px;
             min-width: 110px;
-            height: 20px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -275,9 +275,12 @@
 
 		<label class="toggle-container">
                 <input type="checkbox" id="hold-toggle">
-                Hold
+                Hold Notes
                 </label>
                 
+ 
+            </div>
+
         <!-- Super simple tablet note-stepping key alignment control -->
         <div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 15px;">
             <div class="stepper-container">
@@ -288,14 +291,10 @@
                 <button class="stepper-btn" id="stepper-next-btn" type="button">&gt;</button>
             </div>
         </div>
- 
-            </div>
-
-
 
 
 	<div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 0px;">
-		<canvas id="canvas" width="700" height="650"></canvas>
+		<canvas id="canvas" width="700" height="665"></canvas>
 	</div>
 
         <div class="control-group" style="background: #f7fafc; padding: 3px; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 15px;">
@@ -559,7 +558,7 @@ const TUNING_GAMUT_PRESETS = {
     const textEntry = document.getElementById('text-entry');
     const presetSelect = document.getElementById('preset-select');
     const fileInput = document.getElementById('file-input');
-    const centerX = 350, centerY = 330, radius = 270;
+    const centerX = 350, centerY = 330, radius = 280;
     let nodeClickAreas = []; 
     let currentRotationOffset = 0; 
     let isDraggingScale = false;
