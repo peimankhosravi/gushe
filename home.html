@@ -226,11 +226,15 @@
             <div class="menu-container">
     		<label for="gamut-system-select" style="font-weight: bold; margin-right: 8px;">Tuning Gamut:</label>
     		<select id="gamut-system-select" style="padding: 6px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;">
-        	    <option value="Pythagorean_limit_11_microtones">Pythagorean with limit-11 (Al-Farabi Zalzal) microtones</option>
-        	    <option value="Farad">Farhat</option>
+        	    <option value="Pythagorean_limit_11_microtones">Pythagorean with Limit-11 (Al-Farabi's Zalzal) Microtones</option>
+        	    <option value="Farhat">Farhat</option>
+        	    <option value="ibn_sina_17"> Ibn Sina 17 Fret Oud</option>
         	    <option value="EDO_24"> EDO 24 </option>
-        	    <option value="Just_Intonation"> Just Intonation limit-11 </option>
-        	    <option value="Acoustic_mirror (harmonics 8-15)"> Acoustic with mirror image (harmonics 8-15) </option>
+        	    <option value="Just_Intonation"> Just Intonation Limit-11 </option>
+        	    <option value="Acoustic_mirror (harmonics 8-15)"> Acoustic with Mirror Image (harmonics 8-15) </option>
+
+
+
     		</select>
 	</div>
 
@@ -359,7 +363,7 @@ const TUNING_GAMUT_PRESETS = {
         { name: "B", ratio: "1100.0", type: "dynamic" },
         { name: "C koron", ratio: "1150.0", type: "dynamic" }
     ],
-    "Farad": [
+    "Farhat": [
         { name: "C", ratio: "0.0", type: "dynamic" },
         { name: "D flat", ratio: "90.0", type: "dynamic" },
         { name: "D koron", ratio: "135.0", type: "dynamic" },
@@ -377,6 +381,26 @@ const TUNING_GAMUT_PRESETS = {
         { name: "B flat", ratio: "995.0", type: "dynamic" },
         { name: "B koron", ratio: "1040.0", type: "dynamic" },
         { name: "B", ratio: "1130.0", type: "dynamic" }
+    ],
+
+    "ibn_sina_17": [
+        { name: "C", ratio: "1/1", type: "dynamic" },          // 0.0¢ (Tonic)
+        { name: "D flat", ratio: "273/256", type: "dynamic" }, // 111.4¢
+        { name: "D koron", ratio: "13/12", type: "dynamic" },   // 138.6¢
+        { name: "D", ratio: "9/8", type: "dynamic" },    // 203.9¢
+        { name: "E flat", ratio: "32/27", type: "dynamic" },        // 294.1¢
+        { name: "E koron", ratio: "39/32", type: "dynamic" },   // 342.5¢
+        { name: "E", ratio: "81/64", type: "dynamic" },  // 407.8¢
+        { name: "F", ratio: "4/3", type: "dynamic" },          // 498.0¢
+        { name: "G flat", ratio: "91/64", type: "dynamic" },        // 606.0¢
+        { name: "G koron", ratio: "13/9", type: "dynamic" },    // 636.6¢
+        { name: "G", ratio: "3/2", type: "dynamic" },    // 702.0¢
+        { name: "A flat", ratio: "128/81", type: "dynamic" },       // 792.2¢
+        { name: "A koron", ratio: "13/8", type: "dynamic" },    // 840.5¢
+        { name: "A", ratio: "27/16", type: "dynamic" },  // 905.9¢
+        { name: "B flat", ratio: "16/9", type: "dynamic" },         // 996.1¢
+        { name: "B koron", ratio: "91/48", type: "dynamic" },   // 1104.0¢
+        { name: "B", ratio: "52/27", type: "dynamic" }   // 1134.6¢
     ],
 
     "Just_Intonation": [
@@ -720,10 +744,10 @@ const TUNING_GAMUT_PRESETS = {
             staticCoords[node.name] = { x: centerX + radius * Math.cos(angle), y: centerY + radius * Math.sin(angle) };
             let labelRadius = radius + 45;
             if (node.name === "F sharp" || node.name === "F sori") {
-                labelRadius = radius + 40;
+                labelRadius = radius + 27;
             } else if (node.name === "C koron" || node.name === "C sori") {
-                labelRadius = radius + 30;
-            } else if (node.name === "G" || node.name === "G koron" || node.name === "G flat") {
+                labelRadius = radius + 40;
+            } else if (node.name === "G flat" || node.name === "B koron") {
                 labelRadius = radius + 30; 
             } else if (node.name === "C" || node.name === "D flat" || node.name === "B" || node.name === "B koron" || node.name === "D" || node.name === "D koron") {
                 labelRadius = radius + 30;
