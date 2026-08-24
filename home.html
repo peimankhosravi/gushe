@@ -226,10 +226,11 @@
             <div class="menu-container">
     		<label for="gamut-system-select" style="font-weight: bold; margin-right: 8px;">Tuning Gamut:</label>
     		<select id="gamut-system-select" style="padding: 6px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;">
-        	    <option value="Pythagorean_limit_11_hybrid">Pythagorean limit 11 hybrid</option>
+        	    <option value="Pythagorean_limit_11_microtones">Pythagorean with limit-11 (Al-Farabi Zalzal) microtones</option>
         	    <option value="Farad">Farhat</option>
-        	    <option value="EDO_24">Equal temperament quarter tones</option>
-        	    <option value="Limit_15">Limit 15</option>
+        	    <option value="EDO_24"> EDO 24 </option>
+        	    <option value="Just_Intonation"> Just Intonation limit-11 </option>
+        	    <option value="Acoustic_mirror (harmonics 8-15)"> Acoustic with mirror image (harmonics 8-15) </option>
     		</select>
 	</div>
 
@@ -250,9 +251,10 @@
                     <option value="Bayāt-e Esfahān (Homāyun) = D, E koron(i), F sori, G(a+t), A, B flat, C, D">Bayāt-e Esfahān (Homāyun)</option>
                     <option value="Navā = D, E koron(i), F(a), G(f), A, B flat, C"> Navā </option>
                     <option value="Rast-Panjgah = C, D, E, F(a+f), G, A, B flat"> Rast-Panjgah </option>
-                    <option value="Harmonic Limit-15 = C(H8), 9/8(H9), 5/4(H10), 11/8(H11), 3/2(H12), 13/8(H13), 14/8(H14), 15/8(H15)"> Harmonic Limit-15 </option>
+                    <option value="Acoustic = C(H8), 9/8(H9), 5/4(H10), 11/8(H11), 3/2(H12), 13/8(H13), 14/8(H14), 15/8(H15)"> Acoustic </option>
                     <option value="Farhat = C, 90, 135, 205, 295, 340, 410, 500, 565, 630, 700, 790, 835, 905, 995, 1040, 1130"> Farhat </option>
 		    <option value="EDO24 = C, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150"> EDO </option>
+		    <option value="Just_limit_11 = C, 33/32, 16/15, 12/11, 9/8, 6/5, 11/9, 5/4, 4/3, 11/8, 16/11, 3/2, 8/5, 18/11, 5/3, 9/5, 11/6, 15/8, 64/33"> Just limit-11 </option>
                 </select>
 
             </div>
@@ -294,7 +296,7 @@
 
 
 	<div class="control-group" style="width: 100%; display: flex; justify-content: center; margin-bottom: 0px;">
-		<canvas id="canvas" width="720" height="665"></canvas>
+		<canvas id="canvas" width="730" height="665"></canvas>
 	</div>
 
         <div class="control-group" style="background: #f7fafc; padding: 3px; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 15px;">
@@ -313,7 +315,7 @@
 <script>
 
 const TUNING_GAMUT_PRESETS = {
-    "Pythagorean_limit_11_hybrid": [
+    "Pythagorean_limit_11_microtones": [
         { name: "C", ratio: "1/1", type: "dynamic" },
         { name: "C sori", ratio: "33/32", type: "dynamic" },
         { name: "D flat", ratio: "256/243", type: "dynamic" },
@@ -377,16 +379,47 @@ const TUNING_GAMUT_PRESETS = {
         { name: "B", ratio: "1130.0", type: "dynamic" }
     ],
 
-    "Limit_15": [
+    "Just_Intonation": [
+        { name: "C", ratio: "1/1", type: "dynamic" },          // 0.0¢ (Pure Tonic)
+        { name: "C sori", ratio: "33/32", type: "dynamic" },   // 53.3¢ (11-Limit Quartertone)
+        { name: "D flat", ratio: "16/15", type: "dynamic" },   // 111.7¢ (5-Limit Pure Semitone)
+        { name: "D koron", ratio: "12/11", type: "dynamic" },  // 150.6¢ (11-Limit Neutral Second)
+        { name: "D", ratio: "9/8", type: "dynamic" },          // 203.9¢ (Standard Major Whole Tone)
+        { name: "E flat", ratio: "6/5", type: "dynamic" },     // 315.6¢ (5-Limit Sweet Minor Third)
+        { name: "E koron", ratio: "11/9", type: "dynamic" },    // 347.4¢ (11-Limit Neutral Third)
+        { name: "E", ratio: "5/4", type: "dynamic" },          // 386.3¢ (5-Limit Pure Major Third)
+        { name: "F", ratio: "4/3", type: "dynamic" },          // 498.0¢ (Perfect Fourth)
+        { name: "F sori", ratio: "11/8", type: "dynamic" },    // 551.3¢ (11-Limit Undecimal Tritone)
+        { name: "G koron", ratio: "16/11", type: "dynamic" },  // 648.7¢ (11-Limit Neutral Fifth)
+        { name: "G", ratio: "3/2", type: "dynamic" },          // 702.0¢ (Perfect Fifth)
+        { name: "A flat", ratio: "8/5", type: "dynamic" },     // 813.7¢ (5-Limit Pure Minor Sixth)
+        { name: "A koron", ratio: "18/11", type: "dynamic" },  // 852.6¢ (11-Limit Neutral Sixth)
+        { name: "A", ratio: "5/3", type: "dynamic" },          // 884.4¢ (5-Limit Pure Major Sixth)
+        { name: "B flat", ratio: "9/5", type: "dynamic" },     // 1017.6¢ (5-Limit Minor Seventh)
+        { name: "B koron", ratio: "11/6", type: "dynamic" },   // 1049.4¢ (11-Limit Neutral Seventh)
+        { name: "B", ratio: "15/8", type: "dynamic" },         // 1088.3¢ (5-Limit Pure Major Seventh)
+        { name: "C koron", ratio: "64/33", type: "dynamic" }   // 1146.7¢ (11-Limit Sub-octave)
+    ],
+
+    "Acoustic_mirror (harmonics 8-15)": [
         { name: "C", ratio: "1/1", type: "dynamic" },
+        { name: "D flat", ratio: "16/15", type: "dynamic" },
         { name: "D", ratio: "9/8", type: "dynamic" },
+        { name: "E flat", ratio: "16/14", type: "dynamic" },
+        { name: "E koron", ratio: "16/13", type: "dynamic" },
         { name: "E", ratio: "5/4", type: "dynamic" },
+        { name: "F", ratio: "4/3", type: "dynamic" },
         { name: "F sori", ratio: "11/8", type: "dynamic" },
+        { name: "G koron", ratio: "16/11", type: "dynamic" },
         { name: "G", ratio: "3/2", type: "dynamic" },
+        { name: "A flat", ratio: "8/5", type: "dynamic" },
         { name: "A koron", ratio: "13/8", type: "dynamic" },
         { name: "B flat", ratio: "14/8", type: "dynamic" },
-        { name: "B", ratio: "15/8", type: "dynamic" }
+        { name: "B koron", ratio: "16/9", type: "dynamic" },
+        { name: "B", ratio: "15/8", type: "dynamic" },
+
     ]
+
 };
 
 
@@ -558,7 +591,7 @@ const TUNING_GAMUT_PRESETS = {
     const textEntry = document.getElementById('text-entry');
     const presetSelect = document.getElementById('preset-select');
     const fileInput = document.getElementById('file-input');
-    const centerX = 350, centerY = 330, radius = 280;
+    const centerX = 350, centerY = 330, radius = 270;
     let nodeClickAreas = []; 
     let currentRotationOffset = 0; 
     let isDraggingScale = false;
