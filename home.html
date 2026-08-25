@@ -243,13 +243,13 @@
             <div class="menu-container">
                 <label for="mode" style="font-weight: bold; margin-right: 8px;">Mode:</label>
                 <select id="preset-select">
-                    <option value="Šur = C(a), D(f), E koron, F, G, A(m)-A koron, B flat">Šur</option>
-                    <option value="Dashti (Šur) = C, D(f), E koron, F(a), G, A(s)-A koron, B flat">Dashti (Šur)</option>
+                    <option value="Šur = C(a), D(f), E koron, F, G, A(m) ! A koron, B flat">Šur</option>
+                    <option value="Dashti (Šur) = C, D(f), E koron, F(a), G, A(s) ! A koron, B flat">Dashti (Šur)</option>
                     <option value="Abu Atā (Šur) = C(a), D(f), E koron(a+i), F, G(a+s), A">Abu Atā (Šur)</option>
                     <option value="Bayat-e Tork (Šur) = C(a+i), D, E koron, F(f+s), G, A, B flat">Bayat-e Tork (Šur)</option>
-                    <option value="Afshari (Šur) = C(f), D, E koron(i), F, G(a+s), A koron(m)-A flat, B flat">Afshari (Šur)</option>
+                    <option value="Afshari (Šur) = C(f), D, E koron(i), F, G(a+s), A koron(m) ! A flat, B flat">Afshari (Šur)</option>
                     <option value="Māhur = C(f+a), D(s), E, F, G, A, B"> Māhur </option>
-                    <option value="Segāh = C, D, E koron(t+a+s), F, G, A koron, B flat-B koron"> Segāh </option>
+                    <option value="Segāh = C, D, E koron(t+a+s), F, G, A koron, B flat ! B koron"> Segāh </option>
                     <option value="Čahārgāh = G, A koron(a), B, C(f), D koron, E, F"> Čahārgāh C</option>
                     <option value="Čahārgāh = D, E koron(a), F, G(f), A koron, B, C"> Čahārgāh G</option>
                     <option value="Homāyun = E koron(a), F(i), G(f), A koron(s), B, C, D "> Homāyun </option>
@@ -502,13 +502,16 @@ const TUNING_GAMUT_PRESETS = {
         while (den % 2 === 0 && den > 0) den = Math.floor(den / 2);
         return [num, den];
     }
-    function getCleanSymbolLabel(inputName) {
-        return inputName
-            .replace(" sori", "s")
-            .replace(" koron", "k")
-            .replace(" flat", "♭")
-            .replace(" sharp", "♯");
-    }
+function getCleanSymbolLabel(inputName) {
+    return inputName
+        .replace(" sori", "s")
+        .replace(" koron", "k")
+        .replace("-flat", "♭-")
+        .replace(" flat", "♭")
+        .replace(" sharp", "♯");
+}
+
+
     masterNoteMatrix.forEach((node) => {
         const rawStr = node.ratio;
         const slashPos = rawStr.indexOf("/");
@@ -643,7 +646,7 @@ const TUNING_GAMUT_PRESETS = {
         }
         return bestMatch;
     }
-        function parseSingleItem(itemStr, functionalTags, baseOffset = 0, itemIndex = 0) {
+    function parseSingleItem(itemStr, functionalTags, baseOffset = 0, itemIndex = 0) {
         let cleaned = itemStr.trim();
         let annotation = null;
         if (cleaned.includes("(") && cleaned.endsWith(")")) {
@@ -651,7 +654,29 @@ const TUNING_GAMUT_PRESETS = {
             annotation = cleaned.substring(openIdx + 1, cleaned.length - 1).trim();
             cleaned = cleaned.substring(0, openIdx).trim();
         }
-        let pitch = cleaned;
+
+        // Shorthand Translation Mapping Layer
+        let checkName = cleaned;
+        
+        // Handle flat note variants cleanly
+        if (checkName.endsWith("-flat-") || checkName === "B -flat") {
+            checkName = "B flat-";
+        } else if (checkName.endsWith("b-") || checkName.endsWith("-")) {
+            let root = checkName.replace(/b|-|\s/g, "");
+            checkName = root + " flat-";
+        } else if (checkName.endsWith("-flat")) {
+            checkName = checkName.slice(0, -5) + " flat";
+        } else if (checkName.endsWith("b") && checkName.length > 1) {
+            checkName = checkName.slice(0, -1) + " flat";
+        } else if (checkName.endsWith("#")) {
+            checkName = checkName.slice(0, -1) + " sharp";
+        } else if (checkName.endsWith("p")) {
+            checkName = checkName.slice(0, -1) + " sori";
+        } else if (checkName.endsWith("k")) {
+            checkName = checkName.slice(0, -1) + " koron";
+        }
+
+        let pitch = checkName;
         let pitchOverrideValue = null;
         const isFraction = cleaned.includes("/");
         const isNumericValue = !isNaN(parseFloat(cleaned)) && isFinite(cleaned);
@@ -668,13 +693,11 @@ const TUNING_GAMUT_PRESETS = {
             }
             if (pitchOverrideValue !== null) {
                 const absoluteCents = (pitchOverrideValue + baseOffset + 12000.0) % 1200.0;
-                // Force a unique identifier suffix so adjacent values never collide
                 pitch = matchClosestMatrixNote(absoluteCents) + "__" + itemIndex;
                 customPitches[pitch] = absoluteCents;
             }
         }
         
-        // Check both standard match and unique tracking names
         if (noteNames.includes(pitch) || pitch.includes("__")) {
             if (annotation !== null) functionalTags[pitch] = annotation;
             return pitch;
@@ -789,10 +812,15 @@ const TUNING_GAMUT_PRESETS = {
         
         // Stage 2: Pass that root offset down so numbers stack from the true scale tonic
         items.forEach((item, idx) => {
-            if (item.includes("-")) {
-                const dashIdx = item.indexOf("-");
-                const pPart = item.substring(0, dashIdx).trim();
-                const dPart = item.substring(dashIdx + 1).trim();
+            let workingItem = item.trim();
+
+            // A Moteghayer split is now explicitly defined by the "!" character
+            const hasMoteghayerSplit = workingItem.includes("!");
+
+            if (hasMoteghayerSplit) {
+                const splitIdx = workingItem.indexOf("!");
+                const pPart = workingItem.substring(0, splitIdx).trim();
+                const dPart = workingItem.substring(splitIdx + 1).trim();
                 const pNote = parseSingleItem(pPart, functionalTags, scaleRootOffsetCents, idx + "_p");
                 const dNote = parseSingleItem(dPart, functionalTags, scaleRootOffsetCents, idx + "_d");
                 if (pNote && dNote) {
@@ -801,7 +829,7 @@ const TUNING_GAMUT_PRESETS = {
                     explicitDetours.push(dNote);
                 }
             } else {
-                const pNote = parseSingleItem(item, functionalTags, scaleRootOffsetCents, idx);
+                const pNote = parseSingleItem(workingItem, functionalTags, scaleRootOffsetCents, idx);
                 if (pNote) { primaryLoopNotes.push(pNote); activeVisualScaleNotes.add(pNote); }
             }
         });
@@ -1380,7 +1408,7 @@ function handlePointerDown(e) {
             const num = Number(noteInstance.ratio.substring(0, slashPos));
             const den = Number(noteInstance.ratio.substring(slashPos + 1));
             const baseCentsValue = 1200.0 * Math.log2(num / den);
-            const nonTransposedHz = 261.63 * Math.pow(2.0, baseCentsValue / 1200.0);
+            const nonTransposedHz = masterBaseHz * Math.pow(2.0, baseCentsValue / 1200.0);
             
             const holdActive = document.getElementById('hold-toggle').checked;
             
