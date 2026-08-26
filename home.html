@@ -1263,6 +1263,7 @@ function changeUnderlyingTuningGamut(selectorValue) {
         });
     });
 
+
     // 4. Force audio engine cleanup to kill lingering voice threads
     if (typeof stopAllVoices === 'function') {
         stopAllVoices();
@@ -1279,9 +1280,13 @@ function changeUnderlyingTuningGamut(selectorValue) {
 const gamutDropdownMenu = document.getElementById('gamut-system-select');
 if (gamutDropdownMenu) {
     gamutDropdownMenu.addEventListener('change', (e) => {
+        // RESET TRANSPOSITION: Reset angular rotation to default (0)
+        currentRotationOffset = 0;
+        
         changeUnderlyingTuningGamut(e.target.value);
     });
 }
+
 
 
 window.addEventListener('keydown', (e) => {
@@ -1729,10 +1734,17 @@ if (previewToggleBtn) {
 
 
 
-	presetSelect.addEventListener('change', () => { textEntry.value = presetSelect.value; updatePlot(); }); 
+presetSelect.addEventListener('change', () => { 
+    // RESET TRANSPOSITION: Reset angular rotation to default (0)
+    currentRotationOffset = 0;
+
+    textEntry.value = presetSelect.value; 
+    updatePlot(); 
+}); 
+
         canvas.addEventListener('pointerdown', handlePointerDown); 
- //       canvas.addEventListener('dblclick', handleDoubleClick); 
- //       window.addEventListener('pointermove', handlePointerMove); 
+//      canvas.addEventListener('dblclick', handleDoubleClick); 
+//      window.addEventListener('pointermove', handlePointerMove); 
         window.addEventListener('pointerup', handlePointerUp);
         window.addEventListener('pointercancel', handlePointerUp); // Safe boundary drop handling
 	window.addEventListener('load', () => { setTimeout(updatePlot, 50); }); 
