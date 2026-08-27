@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Octave pYIN Gamut Visualizer (Custom Gamut Input)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            user-select: none;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .header h1 { margin: 0 0 5px 0; font-size: 24px; color: #fff; }
+        .header p { margin: 0; color: #888; font-size: 14px; }
+        .controls-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            background-color: #242424;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            align-items: end;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .control-group.full-width {
+            grid-column: 1 / -1;
+        }
+        label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #aaa; letter-spacing: 0.5px; }
+        input[type="number"], input[type="file"], input[type="range"], input[type="text"] {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="text"] { font-family: monospace; }
+        input[type="range"] { padding: 0; cursor: pointer; }
+        input[type="file"] { padding: 5px; cursor: pointer; }
+        button {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        button:hover { background-color: #555; }
+        
+        .visualizer-window-frame {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background-color: #111;
+            border-radius: 8px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        
+        .scrollbar-simulation-viewport {
+            position: absolute;
+            top: 30px;
+            left: 80px;
+            right: 20px;
+            bottom: 40px;
+            overflow: auto;
+            z-index: 10;
+        }
+        .scroll-stretcher-element {
+            width: 100%;
+            height: 100%;
+        }
+        
+        #visualizerCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .scrollbar-simulation-viewport::-webkit-scrollbar { width: 12px; height: 12px; }
+        .scrollbar-simulation-viewport::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .scrollbar-simulation-viewport::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 6px;
+            border: 2px solid #111;
+        }
+        .scrollbar-simulation-viewport::-webkit-scrollbar-thumb:hover { background-color: #666; }
+        .status-msg { color: #ffb74d; font-size: 13px; min-height: 20px; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Multi-Octave pYIN Gamut Visualizer</h1>
+        <p>Dynamic Custom Gamut text field. Define grids instantly using standard ratio fractions or decimals.</p>
+    </div>
+
+    <div class="controls-panel">
+        <div class="control-group">
+            <label for="fileInput">1. Upload pYIN Text Data</label>
+            <input type="file" id="fileInput" accept=".txt,.csv">
+        </div>
+        <div class="control-group">
+            <label for="cHzInput">2. Calibrated C4 Frequency (Hz)</label>
+            <input type="number" id="cHzInput" value="251.27" step="0.01">
+        </div>
+        <div class="control-group">
+            <label for="zoomX">3. Horizontal Zoom (Time)</label>
+            <input type="range" id="zoomX" min="1" max="25" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label for="zoomY">4. Vertical Zoom (Pitch)</label>
+            <input type="range" id="zoomY" min="1" max="15" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button id="resetViewBtn">Reset View</button>
+            <div id="statusLog" class="status-msg">Awaiting file...</div>
+        </div>
+        <div class="control-group full-width">
+            <label for="gamutInput">5. Define Custom Tuning Gamut (Format: Name = Note:Ratio, Note:Ratio)</label>
+            <input type="text" id="gamutInput" value="Acoustic Mirror Limit-15 = C:1/1, D flat:16/15, D koron:13/12, D:9/8, D sori:16/14, E flat:6/5, E koron:16/13, E:5/4, F:4/3, F sori:11/8, G koron:16/11, G:3/2, A flat:8/5, A koron:13/8, A:5/3, B flat-:14/8, B flat:16/9, B koron:24/13, B:15/8">
+        </div>
+    </div>
+
+    <div class="visualizer-window-frame">
+        <canvas id="visualizerCanvas"></canvas>
+        <div class="scrollbar-simulation-viewport" id="scrollViewport">
+            <div class="scroll-stretcher-element" id="scrollStretcher"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+let activeScaleTitle = "Acoustic Mirror Limit-15";
+let templateCents = { "C": 0 };
+
+let parsedRawData = []; 
+let activePoints = [];  
+let canvas, ctx, scrollViewport, scrollStretcher;
+
+let dataMinTime = 0, dataMaxTime = 10;
+let dataMinCents = 0, dataMaxCents = 1200;
+
+let zoomScaleX = 1;
+let zoomScaleY = 1;
+
+window.addEventListener('DOMContentLoaded', () => {
+    canvas = document.getElementById('visualizerCanvas');
+    ctx = canvas.getContext('2d');
+    scrollViewport = document.getElementById('scrollViewport');
+    scrollStretcher = document.getElementById('scrollStretcher');
+    
+    parseCustomGamutString();
+    
+    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+    document.getElementById('cHzInput').addEventListener('input', updatePitchesAndDraw);
+    document.getElementById('gamutInput').addEventListener('input', () => {
+        parseCustomGamutString();
+        updateVisualization();
+    });
+    
+    document.getElementById('zoomX').addEventListener('input', (e) => {
+        zoomScaleX = parseFloat(e.target.value);
+        updateScrollSizesAndDraw();
+    });
+    document.getElementById('zoomY').addEventListener('input', (e) => {
+        zoomScaleY = parseFloat(e.target.value);
+        updateScrollSizesAndDraw();
+    });
+    
+    document.getElementById('resetViewBtn').addEventListener('click', resetView);
+    scrollViewport.addEventListener('scroll', () => { updateVisualization(); });
+    window.addEventListener('resize', () => { resizeCanvas(); updateVisualization(); });
+    
+    resizeCanvas();
+});
+
+function parseCustomGamutString() {
+    const rawString = document.getElementById('gamutInput').value.trim();
+    if (!rawString) return;
+    
+    try {
+        templateCents = {}; 
+        let notesPart = rawString;
+        
+        // FIXED: String indexes are pulled separately out of the split array to prevent .trim() crashes
+        if (rawString.includes('=')) {
+            const splitParts = rawString.split('=');
+            activeScaleTitle = splitParts[0].trim();
+            notesPart = splitParts[1].trim();
+        }
+        
+        const noteTokens = notesPart.split(',');
+        for (let token of noteTokens) {
+            token = token.trim();
+            if (!token || !token.includes(':')) continue;
+            
+            const pair = token.split(':');
+            const noteName = pair[0].trim();
+            const ratioStr = pair[1].trim();
+            let ratioValue = 1.0;
+            
+            if (ratioStr.includes('/')) {
+                const fractionParts = ratioStr.split('/');
+                const num = parseFloat(fractionParts[0]);
+                const den = parseFloat(fractionParts[1]);
+                if (den > 0) ratioValue = num / den;
+            } else {
+                ratioValue = parseFloat(ratioStr);
+            }
+            
+            if (!isNaN(ratioValue) && ratioValue > 0) {
+                templateCents[noteName] = 1200 * Math.log2(ratioValue);
+            }
+        }
+    } catch (err) {
+        console.error("Parsing failure context: ", err);
+    }
+}
+
+function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    updateVisualization();
+}
+
+function updateScrollSizesAndDraw() {
+    if (activePoints.length === 0) return;
+    const viewWidth = scrollViewport.clientWidth || 800;
+    const viewHeight = scrollViewport.clientHeight || 530;
+    scrollStretcher.style.width = (viewWidth * zoomScaleX) + "px";
+    scrollStretcher.style.height = (viewHeight * zoomScaleY) + "px";
+    updateVisualization();
+}
+
+function resetView() {
+    zoomScaleX = 1; zoomScaleY = 1;
+    document.getElementById('zoomX').value = 1;
+    document.getElementById('zoomY').value = 1;
+    scrollViewport.scrollLeft = 0; scrollViewport.scrollTop = 0;
+    updateScrollSizesAndDraw();
+}
+
+function handleFileUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0]; 
+
+    const statusLog = document.getElementById('statusLog');
+    statusLog.textContent = "Reading file content...";
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n');
+        parsedRawData = [];
+
+        for (let line of lines) {
+            line = line.trim();
+            if (!line || line.startsWith('#')) continue;
+            
+            const tokens = line.split(/\s+/);
+            if (tokens.length >= 2) {
+                const time = parseFloat(tokens[0]);
+                const hz = parseFloat(tokens[1]);
+                if (!isNaN(time) && !isNaN(hz) && hz > 0) {
+                    parsedRawData.push({ time, hz, rawCents: 1200 * Math.log2(hz) });
+                }
+            }
+        }
+
+        if (parsedRawData.length === 0) {
+            statusLog.textContent = "Error: No valid tracking data found.";
+        } else {
+            statusLog.textContent = `Mapped ${parsedRawData.length} active frames!`;
+            resetView();
+            updatePitchesAndDraw();
+        }
+    };
+    reader.readAsText(file);
+}
+
+function updatePitchesAndDraw() {
+    if (parsedRawData.length === 0) return;
+
+    const cRootHz = parseFloat(document.getElementById('cHzInput').value) || 251.27;
+    const cRootAbsoluteCents = 1200 * Math.log2(cRootHz);
+
+    dataMinTime = Infinity; dataMaxTime = -Infinity;
+    dataMinCents = Infinity; dataMaxCents = -Infinity;
+
+    activePoints = parsedRawData.map(pt => {
+        const relativeCents = pt.rawCents - cRootAbsoluteCents;
+        if (pt.time < dataMinTime) dataMinTime = pt.time;
+        if (pt.time > dataMaxTime) dataMaxTime = pt.time;
+        if (relativeCents < dataMinCents) dataMinCents = relativeCents;
+        if (relativeCents > dataMaxCents) dataMaxCents = relativeCents;
+        return { time: pt.time, cents: relativeCents };
+    });
+
+    const paddingCents = 100; 
+    dataMinCents -= paddingCents;
+    dataMaxCents += paddingCents;
+
+    if (dataMaxTime === dataMinTime) dataMaxTime += 1;
+    if (dataMaxCents === dataMinCents) dataMaxCents += 1200;
+
+    updateScrollSizesAndDraw();
+}
+function updateVisualization() {
+    const width = canvas.width / (window.devicePixelRatio || 1);
+    const height = canvas.height / (window.devicePixelRatio || 1);
+
+    ctx.fillStyle = '#111111';
+    ctx.fillRect(0, 0, width, height);
+
+    const paddingLeft = 80;
+    const paddingTop = 30;
+    const plotWidth = width - 100;
+    const plotHeight = height - 70;
+
+    if (activePoints.length === 0) return;
+
+    const scrollLeft = scrollViewport.scrollLeft;
+    const scrollTop = scrollViewport.scrollTop;
+
+    const getViewportX = (t) => {
+        const rawX = paddingLeft + ((t - dataMinTime) / (dataMaxTime - dataMinTime)) * plotWidth;
+        return paddingLeft + (rawX - paddingLeft) * zoomScaleX - scrollLeft;
+    };
+
+    const getViewportY = (c) => {
+        const rawY = (paddingTop + plotHeight) - ((c - dataMinCents) / (dataMaxCents - dataMinCents)) * plotHeight;
+        return (paddingTop + plotHeight) + (rawY - (paddingTop + plotHeight)) * zoomScaleY + scrollTop;
+    };
+
+    const centsRangeSpan = dataMaxCents - dataMinCents;
+    const visibleCentsBottom = dataMinCents + (scrollTop / (plotHeight * zoomScaleY)) * centsRangeSpan;
+    const visibleCentsTop = dataMinCents + ((scrollTop + plotHeight) / (plotHeight * zoomScaleY)) * centsRangeSpan;
+
+    let startOctave = -2;
+    let endOctave = 2;
+    if (isFinite(visibleCentsBottom) && isFinite(visibleCentsTop)) {
+        startOctave = Math.floor(Math.min(visibleCentsBottom, visibleCentsTop) / 1200) - 1;
+        endOctave = Math.ceil(Math.max(visibleCentsBottom, visibleCentsTop) / 1200) + 1;
+    }
+    startOctave = Math.max(-10, Math.min(10, startOctave));
+    endOctave = Math.max(-10, Math.min(10, endOctave));
+
+    ctx.save();
+    
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(paddingLeft, paddingTop, plotWidth, plotHeight);
+
+    ctx.beginPath();
+    ctx.rect(paddingLeft, paddingTop, plotWidth, plotHeight);
+    ctx.clip();
+
+    // 1. Draw horizontal custom gamut bright white grid lines
+    ctx.lineWidth = 1;
+    for (let oct = startOctave; oct <= endOctave; oct++) {
+        const octaveOffsetCents = oct * 1200;
+        for (const [noteName, tCent] of Object.entries(templateCents)) {
+            const continuousCentValue = octaveOffsetCents + tCent;
+            const yPosView = getViewportY(continuousCentValue);
+
+            if (yPosView < paddingTop || yPosView > paddingTop + plotHeight) continue;
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 1.0)';
+            ctx.moveTo(paddingLeft, yPosView);
+            ctx.lineTo(paddingLeft + plotWidth, yPosView);
+            ctx.stroke();
+        }
+    }
+
+    // 2. Draw active voice tracker data trace
+    ctx.beginPath();
+    ctx.strokeStyle = '#2ef2da';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // FIXED: Variables re-declared clearly to remove syntax ReferenceErrors crashes
+    let makingPath = false;
+    const maxTimeGap = 0.05;
+
+    for (let i = 0; i < activePoints.length; i++) {
+        const pt = activePoints[i];
+        const xView = getViewportX(pt.time);
+        const yView = getViewportY(pt.cents);
+
+        if (xView < paddingLeft - 50 || xView > paddingLeft + plotWidth + 50 || 
+            yView < paddingTop - 50 || yView > paddingTop + plotHeight + 50) {
+            makingPath = false;
+            continue;
+        }
+
+        if (!makingPath) {
+            ctx.moveTo(xView, yView);
+            makingPath = true;
+        } else {
+            const timeDelta = pt.time - activePoints[i - 1].time;
+            if (timeDelta > maxTimeGap) {
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(xView, yView);
+            } else {
+                ctx.lineTo(xView, yView);
+            }
+        }
+    }
+    ctx.stroke();
+    ctx.restore(); 
+
+    // 3. Clear and draw static left margin sidebar panel note name text labels
+    ctx.fillStyle = '#111111';
+    ctx.fillRect(0, 0, paddingLeft, height); 
+    ctx.fillRect(paddingLeft + plotWidth, 0, width - paddingLeft - plotWidth, height); 
+
+    for (let oct = startOctave; oct <= endOctave; oct++) {
+        const octaveOffsetCents = oct * 1200;
+        for (const [noteName, tCent] of Object.entries(templateCents)) {
+            const continuousCentValue = octaveOffsetCents + tCent;
+            const yPosView = getViewportY(continuousCentValue);
+
+            if (yPosView < paddingTop - 5 || yPosView > paddingTop + plotHeight + 5) continue;
+
+            const isRootC = (noteName === "C" || tCent === 0);
+            ctx.fillStyle = isRootC ? '#fff' : '#aaa';
+            ctx.font = isRootC ? 'bold 10px sans-serif' : '9px sans-serif';
+            ctx.textAlign = 'right';
+            
+            const octLabel = oct === 0 ? "" : (oct > 0 ? ` (+${oct} Oct)` : ` (${oct} Oct)`);
+            ctx.fillText(`${noteName}${octLabel}`, paddingLeft - 10, yPosView + 3);
+        }
+    }
+
+    // 4. Draw horizontal timeline markers metrics text fields
+    ctx.fillStyle = '#111111';
+    ctx.fillRect(0, paddingTop + plotHeight, width, height - paddingTop - plotHeight); 
+
+    ctx.strokeStyle = '#444';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, paddingTop + plotHeight);
+    ctx.lineTo(paddingLeft + plotWidth, paddingTop + plotHeight);
+    ctx.stroke();
+
+    const currentMinTime = dataMinTime + (scrollLeft / (plotWidth * zoomScaleX)) * (dataMaxTime - dataMinTime);
+    const currentMaxTime = dataMinTime + ((scrollLeft + plotWidth) / (plotWidth * zoomScaleX)) * (dataMaxTime - dataMinTime);
+
+    ctx.fillStyle = '#888';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${Math.max(dataMinTime, currentMinTime).toFixed(1)}s`, paddingLeft, paddingTop + plotHeight + 18);
+    ctx.textAlign = 'right';
+    ctx.fillText(`${Math.min(dataMaxTime, currentMaxTime).toFixed(1)}s`, paddingLeft + plotWidth, paddingTop + plotHeight + 18);
+    ctx.textAlign = 'center';
+    ctx.fillText(`${activeScaleTitle} Timeline`, paddingLeft + (plotWidth / 2), paddingTop + plotHeight + 20);
+}
+</script>
+</body>
+</html>
