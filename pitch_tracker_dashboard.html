@@ -144,7 +144,7 @@
         </div>
         <div class="control-group full-width">
             <label for="gamutInput">5. Define Custom Tuning Gamut (Format: Name = Note:Ratio, Note:Ratio)</label>
-            <input type="text" id="gamutInput" value="Acoustic Mirror Limit-15 = C:1/1, D flat:16/15, D koron:13/12, D:9/8, D sori:16/14, E flat:6/5, E koron:16/13, E:5/4, F:4/3, F sori:11/8, G koron:16/11, G:3/2, A flat:8/5, A koron:13/8, A:5/3, B flat-:14/8, B flat:16/9, B koron:24/13, B:15/8">
+            <input type="text" id="gamutInput" value="Acoustic Mirror Limit-11 = C:1/1, D flat:9/8, E koron:11/9, E:5/4, F:4/3, G:3/2, A koron:18/11, A:5/3, B -flat: 7/4">
         </div>
     </div>
 
@@ -209,7 +209,7 @@ function parseCustomGamutString() {
         templateCents = {}; 
         let notesPart = rawString;
         
-        // FIXED: String indexes are pulled separately out of the split array to prevent .trim() crashes
+        // Isolate the Scale Preset Title name safely
         if (rawString.includes('=')) {
             const splitParts = rawString.split('=');
             activeScaleTitle = splitParts[0].trim();
@@ -217,11 +217,18 @@ function parseCustomGamutString() {
         }
         
         const noteTokens = notesPart.split(',');
+        
+        // FIX: Sort tokens dynamically by character string length descending
+        // This ensures complex names like "A flat" are evaluated completely before short names like "A"
+        noteTokens.sort((a, b) => b.trim().length - a.trim().length);
+        
         for (let token of noteTokens) {
             token = token.trim();
             if (!token || !token.includes(':')) continue;
             
             const pair = token.split(':');
+            if (pair.length < 2) continue;
+            
             const noteName = pair[0].trim();
             const ratioStr = pair[1].trim();
             let ratioValue = 1.0;
@@ -236,11 +243,14 @@ function parseCustomGamutString() {
             }
             
             if (!isNaN(ratioValue) && ratioValue > 0) {
-                templateCents[noteName] = 1200 * Math.log2(ratioValue);
+                // Safeguard against overwriting unless it's a completely unique key string identity
+                if (templateCents[noteName] === undefined) {
+                    templateCents[noteName] = 1200 * Math.log2(ratioValue);
+                }
             }
         }
     } catch (err) {
-        console.error("Parsing failure context: ", err);
+        console.error("Token sorting normalization error check layout elements: ", err);
     }
 }
 
@@ -336,6 +346,7 @@ function updatePitchesAndDraw() {
 
     updateScrollSizesAndDraw();
 }
+
 function updateVisualization() {
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
