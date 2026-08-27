@@ -227,11 +227,10 @@
     		<label for="gamut-system-select" style="font-weight: bold; margin-right: 8px;">Tuning Gamut:</label>
     		<select id="gamut-system-select" style="padding: 6px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;">
         	    <option value="Pythagorean_limit_11_microtones">Pythagorean with Limit-11 (Al-Farabi's Zalzal) Microtones</option>
-        	    <option value="Farhat">Farhat</option>
+               	    <option value="Acoustic_mirror limit-11"> Acoustic Mirror Limit-11 </option>
+  		    <option value="Farhat">Farhat</option>
         	    <option value="ibn_sina_17"> Ibn Sina 17 Fret Oud</option>
         	    <option value="EDO_24"> EDO 24 </option>
-        	    <option value="Just_Intonation"> Just Intonation Limit-11 </option>
-        	    <option value="Acoustic_mirror limit-15"> Acoustic Mirror Limit-15 </option>
 
 
 
@@ -406,49 +405,28 @@ const TUNING_GAMUT_PRESETS = {
         { name: "B", ratio: "52/27", type: "dynamic" }   // 1134.6¢
     ],
 
-    "Just_Intonation": [
-        { name: "C", ratio: "1/1", type: "dynamic" },          // 0.0¢ (Pure Tonic)
-        { name: "C sori", ratio: "33/32", type: "dynamic" },   // 53.3¢ (11-Limit Quartertone)
-        { name: "D flat", ratio: "16/15", type: "dynamic" },   // 111.7¢ (5-Limit Pure Semitone)
-        { name: "D koron", ratio: "12/11", type: "dynamic" },  // 150.6¢ (11-Limit Neutral Second)
-        { name: "D", ratio: "9/8", type: "dynamic" },          // 203.9¢ (Standard Major Whole Tone)
-        { name: "E flat", ratio: "6/5", type: "dynamic" },     // 315.6¢ (5-Limit Sweet Minor Third)
-        { name: "E koron", ratio: "11/9", type: "dynamic" },    // 347.4¢ (11-Limit Neutral Third)
-        { name: "E", ratio: "5/4", type: "dynamic" },          // 386.3¢ (5-Limit Pure Major Third)
-        { name: "F", ratio: "4/3", type: "dynamic" },          // 498.0¢ (Perfect Fourth)
-        { name: "F sori", ratio: "11/8", type: "dynamic" },    // 551.3¢ (11-Limit Undecimal Tritone)
-        { name: "G koron", ratio: "16/11", type: "dynamic" },  // 648.7¢ (11-Limit Neutral Fifth)
-        { name: "G", ratio: "3/2", type: "dynamic" },          // 702.0¢ (Perfect Fifth)
-        { name: "A flat", ratio: "8/5", type: "dynamic" },     // 813.7¢ (5-Limit Pure Minor Sixth)
-        { name: "A koron", ratio: "18/11", type: "dynamic" },  // 852.6¢ (11-Limit Neutral Sixth)
-        { name: "A", ratio: "5/3", type: "dynamic" },          // 884.4¢ (5-Limit Pure Major Sixth)
-        { name: "B flat", ratio: "9/5", type: "dynamic" },     // 1017.6¢ (5-Limit Minor Seventh)
-        { name: "B koron", ratio: "11/6", type: "dynamic" },   // 1049.4¢ (11-Limit Neutral Seventh)
-        { name: "B", ratio: "15/8", type: "dynamic" },         // 1088.3¢ (5-Limit Pure Major Seventh)
-        { name: "C koron", ratio: "64/33", type: "dynamic" }   // 1146.7¢ (11-Limit Sub-octave)
-    ],
-
-    "Acoustic_mirror limit-15": [
+    "Acoustic_mirror limit-11": [
         { name: "C", ratio: "1/1", type: "dynamic" },
+        { name: "C sori", ratio: "33/32", type: "dynamic" },   
         { name: "D flat", ratio: "16/15", type: "dynamic" },
-        { name: "D koron", ratio: "13/12", type: "dynamic" },
+        { name: "D koron", ratio: "12/11", type: "dynamic" },
         { name: "D", ratio: "9/8", type: "dynamic" },
-        { name: "D sori", ratio: "16/14", type: "dynamic" },
+        { name: "D sori", ratio: "8/7", type: "dynamic" },
         { name: "E flat", ratio: "6/5", type: "dynamic" },
-        { name: "E koron", ratio: "16/13", type: "dynamic" },
+        { name: "E koron", ratio: "11/9", type: "dynamic" },
         { name: "E", ratio: "5/4", type: "dynamic" },
         { name: "F", ratio: "4/3", type: "dynamic" },
         { name: "F sori", ratio: "11/8", type: "dynamic" },
         { name: "G koron", ratio: "16/11", type: "dynamic" },
         { name: "G", ratio: "3/2", type: "dynamic" },
         { name: "A flat", ratio: "8/5", type: "dynamic" },
-        { name: "A koron", ratio: "13/8", type: "dynamic" },
+        { name: "A koron", ratio: "18/11", type: "dynamic" },
         { name: "A", ratio: "5/3", type: "dynamic" },
-        { name: "B flat-", ratio: "14/8", type: "dynamic" },
+        { name: "B flat-", ratio: "7/4", type: "dynamic" },
         { name: "B flat", ratio: "16/9", type: "dynamic" },
-        { name: "B koron", ratio: "24/13", type: "dynamic" },
+        { name: "B koron", ratio: "11/6", type: "dynamic" },
         { name: "B", ratio: "15/8", type: "dynamic" },
-
+        { name: "C koron", ratio: "64/33", type: "dynamic" }  
     ]
 
 };
