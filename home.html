@@ -246,11 +246,11 @@
                     <option value="Dashti (Šur) = C, D(f), E koron, F(a), G, A(s) ! A koron, B flat">Dashti (Šur)</option>
                     <option value="Abu Atā (Šur) = C(a), D(f), E koron(a+i), F, G(a+s), A">Abu Atā (Šur)</option>
                     <option value="Bayat-e Tork (Šur) = C(a+i), D, E koron, F(f+s), G, A ! A koron, B flat">Bayat-e Tork (Šur)</option>
-                    <option value="Afshari (Šur) = C(f), D, E koron(i), F, G(a+s), A koron(m) ! A flat, B flat">Afshari (Šur)</option>
+                    <option value="Afshari (Šur) = C(f), D ! D koron, E koron(i), F, G(a+s), A koron(m) ! A, B flat">Afshari (Šur)</option>
                     <option value="Māhur = C(f+a), D(s), E, F, G, A, B"> Māhur </option>
                     <option value="Segāh = C, D, E koron(t+a+s), F, G, A koron, B flat ! B koron"> Segāh </option>
-                    <option value="Čahārgāh = G, A koron(a), B, C(f), D koron, E, F"> Čahārgāh</option>
-                    <option value="Homāyun = E koron(a), F(i), G(f), A koron(s), B, C, D "> Homāyun </option>
+                    <option value="Čahārgāh = C(f), D koron, E, F, G, A koron(a), B"> Čahārgāh</option>
+                    <option value="Homāyun = E koron(a), F(i), G(f), A koron(s), B, C, D"> Homāyun </option>
                     <option value="Bayāt-e Esfahān (Homāyun) = D, E koron(i), F sori, G(a+f), A, B flat, C, D">Bayāt-e Esfahān (Homāyun)</option>
                     <option value="Navā = D, E koron(i), F(a), G(f), A, B flat, C"> Navā </option>
                     <option value="Rast-Panjgah = C, D, E, F(a+f), G, A, B flat"> Rast-Panjgah </option>
@@ -405,17 +405,21 @@ const TUNING_GAMUT_PRESETS = {
 
     "Rational limit-13": [
         { name: "C", ratio: "1/1", type: "dynamic" },
-		{ name: "D koron", ratio: "13/12", type: "dynamic" },
+	{ name: "D koron", ratio: "13/12", type: "dynamic" },
         { name: "D", ratio: "9/8", type: "dynamic" },
+        { name: "E flat", ratio: "7/6", type: "dynamic" },
         { name: "E koron", ratio: "39/32", type: "dynamic" },
         { name: "E", ratio: "5/4", type: "dynamic" },
         { name: "F", ratio: "4/3", type: "dynamic" },
         { name: "F sori", ratio: "11/8", type: "dynamic" },
+        { name: "F sharp", ratio: "45/32", type: "dynamic" },
         { name: "G", ratio: "3/2", type: "dynamic" },
-        { name: "A flat", ratio: "8/5", type: "dynamic" },
+        { name: "A flat", ratio: "14/9", type: "dynamic" },
         { name: "A koron", ratio: "13/8", type: "dynamic" },
         { name: "A", ratio: "5/3", type: "dynamic" },
-        { name: "B flat", ratio: "14/8", type: "dynamic" },
+        { name: "A+", ratio: "27/16", type: "dynamic" },
+        { name: "B flat-", ratio: "7/4", type: "dynamic" },
+        { name: "B flat", ratio: "16/9", type: "dynamic" },
         { name: "B koron", ratio: "24/13", type: "dynamic" },
         { name: "B", ratio: "15/8", type: "dynamic" },
     ]
@@ -475,7 +479,7 @@ function getCleanSymbolLabel(inputName) {
     return inputName
         .replace(" sori", "s")
         .replace(" koron", "k")
-        .replace("-flat", "♭-")
+        .replace(" flat-", "♭-")
         .replace(" flat", "♭")
         .replace(" sharp", "♯");
 }
@@ -628,7 +632,7 @@ function getCleanSymbolLabel(inputName) {
         let checkName = cleaned;
         
         // Handle flat note variants cleanly
-        if (checkName.endsWith("-flat-") || checkName === "B -flat") {
+        if (checkName.endsWith("-flat-") || checkName === "B flat-") {
             checkName = "B flat-";
         } else if (checkName.endsWith("b-") || checkName.endsWith("-")) {
             let root = checkName.replace(/b|-|\s/g, "");
@@ -1705,7 +1709,7 @@ if (previewToggleBtn) {
 
 presetSelect.addEventListener('change', () => { 
     // RESET TRANSPOSITION: Reset angular rotation to default (0)
-    currentRotationOffset = 0;
+    //currentRotationOffset = 0;
 
     textEntry.value = presetSelect.value; 
     updatePlot(); 
