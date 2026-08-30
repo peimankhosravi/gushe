@@ -250,8 +250,8 @@
                     <option value="Māhur = C(f+a), D(s), E, F, G, A, B"> Māhur </option>
                     <option value="Segāh = C, D, E koron(t+a+s), F, G, A koron, B flat ! B koron"> Segāh </option>
                     <option value="Čahārgāh = C(f), D koron, E, F, G, A koron(a), B"> Čahārgāh</option>
-                    <option value="Homāyun = D, E koron(a), F(i), G(f), A koron(s), B, C"> Homāyun </option>
-                    <option value="Bayāt-e Esfahān (Homāyun) = D, E koron(i), F sori, G(a+f), A, B flat, C">Bayāt-e Esfahān (Homāyun)</option>
+                    <option value="Homāyun = E koron(a), F(i), G(f), A koron(s), B, C, D"> Homāyun </option>
+                    <option value="Bayāt-e Esfahān (Homāyun) = C, D, E koron(i), F, G(a+f), A, B flat">Bayāt-e Esfahān (Homāyun)</option>
                     <option value="Navā = D, E koron(i), F(a), G(f), A, B flat, C"> Navā </option>
                     <option value="Rast-Panjgah = C, D, E, F(a+f), G, A, B flat"> Rast-Panjgah </option>
                     <option value="Acoustic = C(H8), 9/8(H9), 5/4(H10), 11/8(H11), 3/2(H12), 13/8(H13), 14/8(H14), 15/8(H15)"> Acoustic </option>
@@ -650,13 +650,13 @@ function getCleanSymbolLabel(inputName) {
             checkName = root + " flat-";
         } else if (checkName.endsWith("-flat")) {
             checkName = checkName.slice(0, -5) + " flat";
-        } else if (checkName.endsWith("b") && checkName.length > 1) {
+        } else if (checkName.endsWith("b") && checkName.length > 1 && !checkName.endsWith("sharp") && !checkName.endsWith("koron") && !checkName.endsWith("sori") && !checkName.endsWith("flat")) {
             checkName = checkName.slice(0, -1) + " flat";
         } else if (checkName.endsWith("#")) {
             checkName = checkName.slice(0, -1) + " sharp";
-        } else if (checkName.endsWith("p")) {
+        } else if (checkName.endsWith("p") && !checkName.endsWith("sharp")) { // FIXED: Blocks "sharp" from triggering the sori converter!
             checkName = checkName.slice(0, -1) + " sori";
-        } else if (checkName.endsWith("k")) {
+        } else if (checkName.endsWith("k") && !checkName.endsWith("black")) {
             checkName = checkName.slice(0, -1) + " koron";
         }
 
