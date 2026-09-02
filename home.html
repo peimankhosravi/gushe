@@ -642,10 +642,15 @@ function getCleanSymbolLabel(inputName) {
         // Shorthand Translation Mapping Layer
         let checkName = cleaned;
         
+        // 1. AUTO-CONVERT SPACES WITH DASHES: Fixes "D -" or "D -" variants instantly into "D-"
+        if (checkName.includes(" -")) {
+            checkName = checkName.replace(/\s+-/g, "-");
+        }
+        
         // Handle flat note variants cleanly
         if (checkName.endsWith("-flat-") || checkName === "B flat-") {
             checkName = "B flat-";
-        } else if (checkName.endsWith("b-") || checkName.endsWith("-")) {
+        } else if (checkName.endsWith("b-") || (checkName.endsWith("-") && !checkName.includes("-"))) {
             let root = checkName.replace(/b|-|\s/g, "");
             checkName = root + " flat-";
         } else if (checkName.endsWith("-flat")) {
@@ -654,7 +659,7 @@ function getCleanSymbolLabel(inputName) {
             checkName = checkName.slice(0, -1) + " flat";
         } else if (checkName.endsWith("#")) {
             checkName = checkName.slice(0, -1) + " sharp";
-        } else if (checkName.endsWith("p") && !checkName.endsWith("sharp")) { // FIXED: Blocks "sharp" from triggering the sori converter!
+        } else if (checkName.endsWith("p") && !checkName.endsWith("sharp")) { 
             checkName = checkName.slice(0, -1) + " sori";
         } else if (checkName.endsWith("k") && !checkName.endsWith("black")) {
             checkName = checkName.slice(0, -1) + " koron";
